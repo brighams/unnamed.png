@@ -24,19 +24,33 @@
       padding: 8px;
     }
 
-    #stage img {
+    #frame {
+      position: relative;
+      flex-shrink: 0;
+      line-height: 0;
+    }
+
+    #frame img#painting {
       width: 100%;
       height: 100%;
-      object-fit: contain;
       display: block;
+    }
+
+    #frame img#sig {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 10%;
     }
   </style>
 </head>
 <body>
   <div id="stage">
-    <img src="unnamed.png" alt="Early digital painting  I created for Apple Computer to be published with my sample code for creating Macintosh applications in C on Apple's developer CD around 1992/93.">
+    <div id="frame">
+      <img id="painting" src="unnamed.png" alt="Early digital painting I created for Apple Computer to be published with my sample code for creating Macintosh applications in C on Apple's developer CD around 1992/93.">
+      <img id="sig" src="email.png" alt="">
+    </div>
   </div>
-  <img src="email.png" style="width:10%; position:fixed; bottom:13px; right:13px;">
   <audio id="music" src="orbit-d0d-main-version-29627-02-39.mp3" loop></audio>
   <script>
     const music = document.getElementById('music')
@@ -59,6 +73,24 @@
         document.documentElement.requestFullscreen()
       }
     })
+
+    const painting = document.getElementById('painting')
+    const frame = document.getElementById('frame')
+    const stage = document.getElementById('stage')
+    const PADDING = 8
+
+    const fit = () => {
+      const availW = stage.clientWidth - PADDING * 2
+      const availH = stage.clientHeight - PADDING * 2
+      const ratio = painting.naturalWidth / painting.naturalHeight
+      const w = availW / availH > ratio ? availH * ratio : availW
+      const h = w / ratio
+      frame.style.width = `${w}px`
+      frame.style.height = `${h}px`
+    }
+
+    painting.complete ? fit() : painting.addEventListener('load', fit)
+    window.addEventListener('resize', fit)
   </script>
 </body>
 </html>
