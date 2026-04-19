@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>unnamed.png</title>
+  <link rel="icon" href="unnamed.png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+
+    #stage {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    #stage img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <img src="unnamed.png" alt="">
+  </div>
+  <audio id="music" src="orbit-d0d-main-version-29627-02-39.mp3" loop></audio>
+  <script>
+    const music = document.getElementById('music')
+    music.volume = 0.5
+
+    const start = () => {
+      music.play().catch(() => {})
+      document.removeEventListener('click', start)
+      document.removeEventListener('keydown', start)
+    }
+
+    document.addEventListener('click', start)
+    document.addEventListener('keydown', start)
+    music.play().catch(() => {})
+
+    document.getElementById('stage').addEventListener('dblclick', () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen()
+      } else {
+        document.documentElement.requestFullscreen()
+      }
+    })
+  </script>
+</body>
+</html>
