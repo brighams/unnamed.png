@@ -14,12 +14,14 @@ use winit::window::{CursorIcon, Fullscreen, ResizeDirection, Window, WindowId};
 
 const IMAGE_BYTES: &[u8] =
     include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/../unnamed.png"));
+const SIG_BYTES: &[u8] =
+    include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/../email.png"));
 const MUSIC_BYTES: &[u8] = include_bytes!(concat!(
     env!("CARGO_MANIFEST_DIR"),
     "/../orbit-d0d-main-version-29627-02-39.mp3"
 ));
-const _MUSIC_LICENSE: &str =
-    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../music.md"));
+
+const SIG_SCALE: f32 = 0.10;
 
 const BORDER: f64 = 8.0;
 const DOUBLE_CLICK_MS: u64 = 400;
@@ -62,6 +64,9 @@ struct App {
     image: RgbaImage,
     img_width: u32,
     img_height: u32,
+    sig: RgbaImage,
+    sig_width: u32,
+    sig_height: u32,
     last_click: Option<Instant>,
     pre_expand_size: Option<PhysicalSize<u32>>,
     expanded: bool,
@@ -76,6 +81,10 @@ impl App {
         let img_width = img.width();
         let img_height = img.height();
         let image = img.to_rgba8();
+        let sig_img = image::load_from_memory(SIG_BYTES).expect("embedded sig is valid");
+        let sig_width = sig_img.width();
+        let sig_height = sig_img.height();
+        let sig = sig_img.to_rgba8();
         Self {
             window: None,
             context: None,
@@ -83,6 +92,9 @@ impl App {
             image,
             img_width,
             img_height,
+            sig,
+            sig_width,
+            sig_height,
             last_click: None,
             pre_expand_size: None,
             expanded: false,
@@ -136,6 +148,36 @@ impl App {
                     let g = g as u32 * a as u32 / 255;
                     let b = b as u32 * a as u32 / 255;
                     buf[idx] = 0xFF000000 | (r << 16) | (g << 8) | b;
+                }
+            }
+        }
+
+        // signature: bottom-right of the drawn image, scaled to SIG_SCALE of image width
+        let sig_w = (draw_w as f32 * SIG_SCALE) as u32;
+        let sig_h = (self.sig_height as f32 * sig_w as f32 / self.sig_width as f32) as u32;
+        let sig_scale = sig_w as f32 / self.sig_width as f32;
+        let sig_off_x = off_x + draw_w - sig_w;
+        let sig_off_y = off_y + draw_h - sig_h;
+
+        for dy in 0..sig_h {
+            for dx in 0..sig_w {
+                let src_x = ((dx as f32 / sig_scale) as u32).min(self.sig_width - 1);
+                let src_y = ((dy as f32 / sig_scale) as u32).min(self.sig_height - 1);
+                let [r, g, b, a] = self.sig.get_pixel(src_x, src_y).0;
+                if a == 0 { continue; }
+                let dst_x = sig_off_x + dx;
+                let dst_y = sig_off_y + dy;
+                if dst_x < width && dst_y < height {
+                    let idx = (dst_y * width + dst_x) as usize;
+                    let a = a as u32;
+                    let dst = buf[idx];
+                    let dr = (dst >> 16) & 0xFF;
+                    let dg = (dst >> 8) & 0xFF;
+                    let db = dst & 0xFF;
+                    let or_ = (r as u32 * a + dr * (255 - a)) / 255;
+                    let og = (g as u32 * a + dg * (255 - a)) / 255;
+                    let ob = (b as u32 * a + db * (255 - a)) / 255;
+                    buf[idx] = 0xFF000000 | (or_ << 16) | (og << 8) | ob;
                 }
             }
         }
