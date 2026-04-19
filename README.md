@@ -5,6 +5,10 @@ unnamed.png -- original artwork of mine from Apple Macintosh Sample Code I wrote
 
 ---
 
+Someone found an old original digitial painting I made for Apple Computer when I worked their in the early 90s for official sample code published on their developer CDs for the 68k reigning Mac legacy. It was so nice to receive this, I had to publish it again right away.
+
+**funny enough, Apple Computer, Inc. probably has the (c) on this image! Thanks apple ♥️ u!**
+
 In the spirit of long lived sample code here are two apps, one HTML and the other a rust desktop app.
 
 ---
