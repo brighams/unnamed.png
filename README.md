@@ -12,7 +12,21 @@ Someone found an old original digitial painting I made for Apple Computer when I
 In the spirit of long lived sample code here are two apps, one HTML and the other a rust desktop app.
 
 ---
+*(CK This is for you DINGUS!)*
 
+# BUILD AND RUN RUST - Linux, macOS, and the other one
+https://rust-lang.org/tools/install/
+
+1. Install rustup
+``curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh``
+*(you might have to fddle with paths, probably not, you should be able to do ``cargo build`` for rust projects)*
+
+2. Clone, Build, & Run
+``
+https://github.com/brighams/unnamed.png
+cd unnamed.png
+./rust.sh 
+``
 
 ## Demo Commands:
 
@@ -27,12 +41,6 @@ Serve index.html from your favorite browser, or view it at
 
 https://brighams.github.io/unnamed.png
 
-## RUST
-rust build & run:
-
-``
-./rust.sh 
-``
 ## Enjoy
 
 ![yours truly, YT!](email.png)
