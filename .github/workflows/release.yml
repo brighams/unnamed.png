@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            binary: unnamed
+          - os: macos-13
+            target: x86_64-apple-darwin
+            binary: unnamed
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            binary: unnamed
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            binary: unnamed.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libasound2-dev \
+            libx11-dev \
+            libxkbcommon-dev \
+            libwayland-dev \
+            libdrm-dev \
+            pkg-config
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Build
+        working-directory: rust
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Rename binary
+        shell: bash
+        run: |
+          src="rust/target/${{ matrix.target }}/release/${{ matrix.binary }}"
+          ext="${{ matrix.binary == 'unnamed.exe' && '.exe' || '' }}"
+          cp "$src" "unnamed-${{ matrix.target }}${ext}"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: unnamed-${{ matrix.target }}${{ matrix.binary == 'unnamed.exe' && '.exe' || '' }}

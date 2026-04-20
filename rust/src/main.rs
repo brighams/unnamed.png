@@ -9,6 +9,7 @@ use softbuffer::Surface;
 use winit::application::ApplicationHandler;
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 use winit::event::{ElementState, MouseButton, WindowEvent};
+use winit::keyboard::{Key, NamedKey};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::window::{CursorIcon, Fullscreen, ResizeDirection, Window, WindowId};
 
@@ -265,6 +266,28 @@ impl ApplicationHandler for App {
                     let _ = window.drag_resize_window(dir);
                 } else {
                     let _ = window.drag_window();
+                }
+            }
+
+            WindowEvent::KeyboardInput { event, .. } => {
+                if event.state == ElementState::Pressed {
+                    match &event.logical_key {
+                        Key::Named(NamedKey::Space) => {
+                            if let Some(sink) = &self._sink {
+                                if sink.is_paused() { sink.play(); } else { sink.pause(); }
+                            }
+                        }
+                        Key::Character(s) => {
+                            if let Some(d) = s.chars().next().and_then(|c| c.to_digit(10)) {
+                                if (1..=9).contains(&d) {
+                                    if let Some(sink) = &self._sink {
+                                        sink.set_volume(d as f32 / 10.0);
+                                    }
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
                 }
             }
 

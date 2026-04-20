@@ -34,7 +34,8 @@ cd unnamed.png
 |--------|--------|
 | click and drag edges | resize |
 | double click | fullscreen on current display |
-
+| spacebar | pause/play music (rust only) |
+| 1 - 9 | set volume level from 10% to 90% (rust only) |
 
 ## HTML
 Serve index.html from your favorite browser, or view it at 
